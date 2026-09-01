@@ -10,7 +10,7 @@ export const verificationEmailTemplate = (otp, name) => {
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="text-align: center; padding: 20px 0;">
-                <h1 style="color: #4f46e5; margin: 0;">Project GoBazar</h1>
+                <h1 style="color: #4f46e5; margin: 0;">GoBazar</h1>
             </div>
             
             <div style="padding: 20px 0;">
@@ -57,7 +57,7 @@ export const passwordResetEmailTemplate = (otp, name) => {
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="text-align: center; padding: 20px 0;">
-                <h1 style="color: #4f46e5; margin: 0;">Project GoBazar</h1>
+                <h1 style="color: #4f46e5; margin: 0;">GoBazar</h1>
             </div>
             
             <div style="padding: 20px 0;">
