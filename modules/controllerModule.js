@@ -1,0 +1,14 @@
+export { default as googleLoginController } from '../controllers/googleLoginController.js';
+export { default as logout } from '../controllers/logout.js';
+export { default as newToken } from '../controllers/newToken.js';
+export { default as me } from '../controllers/me.js';
+export { default as register } from '../controllers/register.js';
+export { default as login } from '../controllers/login.js';
+export { default as verifyEmail } from '../controllers/verifyEmail.js';
+export { default as resendEmailVerificationOtp } from '../controllers/emailVerificationOtp.js';
+export { default as forgotPassword } from '../controllers/forgotPassword.js';
+export { default as resetPassword } from '../controllers/resetPassword.js';
+export { createWish, getWishList } from '../controllers/wishController.js';
+export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController } from '../controllers/orderController.js';
+export { getAllUsersController, updateProfileController, updateProfilePictureController, deleteUserController } from '../controllers/userController.js';
+export { getProductReviewsController, createReviewController, toggleHelpfulController, deleteReviewController } from '../controllers/reviewController.js';
