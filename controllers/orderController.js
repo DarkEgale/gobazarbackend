@@ -1,13 +1,13 @@
-import { createOrder, getMyOrders, getAllOrders, getOrderById } from '../modules/serviceModule.js';
+import { createOrder, getMyOrders, getAllOrders, getOrderById, updateOrderStatus } from '../modules/serviceModule.js';
 import { Response } from '../modules/module.js';
 
 
 const createOrderController = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { products, paymentMethod, address } = req.body;
+        const { products, paymentMethod, address, phone } = req.body;
         console.log('[Product]', products)
-        const order = await createOrder(userId, products, paymentMethod, address)
+        const order = await createOrder(userId, products, paymentMethod, address, phone)
         console.log(order)
         return Response(res, true, 201, 'Order Successful', order)
     } catch (error) {
@@ -56,4 +56,27 @@ const getOrderByIdController = async (req, res) => {
     }
 }
 
-export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController }
+// update order controllers for admin
+
+const ALLOWED_ORDER_STATUSES = ['pending', 'shipping', 'shipped', 'on_the_way', 'deliverd'];
+
+const updateOrderStatusController = async (req, res) => {
+    try {
+        const { orderId, orderStatus } = req.body;
+
+        if (!orderId) {
+            return Response(res, false, 400, 'orderId is required')
+        }
+        if (!orderStatus || !ALLOWED_ORDER_STATUSES.includes(orderStatus)) {
+            return Response(res, false, 400, `Invalid order status. Allowed: ${ALLOWED_ORDER_STATUSES.join(', ')}`)
+        }
+        const updateOrder = await updateOrderStatus(orderId, orderStatus)
+        return Response(res, true, 200, 'Order status updated successfully', updateOrder)
+    } catch (error) {
+        console.log('[Update Order Status]', error);
+        const statusCode = error.message === 'Failed to update order' ? 404 : 500;
+        return Response(res, false, statusCode, error.message || 'Failed to update order status');
+    }
+}
+
+export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController, updateOrderStatusController }

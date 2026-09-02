@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema({
         {
             productId: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Product",
+                ref: "Products",
                 required: true
             },
             price: {
@@ -26,7 +26,7 @@ const orderSchema = new mongoose.Schema({
     ],
     paymentMethod: {
         type: String,
-        enum: ['bekash', 'nagad', 'cash']
+        enum: ['bkash', 'nagad', 'cash']
     },
     paymentStatus: {
         type: String,
@@ -43,9 +43,13 @@ const orderSchema = new mongoose.Schema({
         trim: true,
         maxlength: [500, "Address can not exceed 500 characters"]
     },
+    phone: {
+        type: Number,
+        required: [true, "Phone number is required"],
+    },
     orderStatus: {
         type: String,
-        enum: ['pending', 'shipping', 'shipped', 'on the way', 'deliverd'],
+        enum: ['pending', 'shipping', 'shipped', 'on_the_way', 'deliverd'],
         default: "pending"
     },
     deliveryCharge: {
@@ -57,6 +61,8 @@ const orderSchema = new mongoose.Schema({
         default: 0
     }
 }, { timestamps: true })
+
+orderSchema.index({ userId: 1, createdAt: -1 }); // Index for userId and createdAt for faster queries
 
 const ORDER = mongoose.model('Order', orderSchema)
 

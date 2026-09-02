@@ -6,7 +6,7 @@ import Products from '../models/products.model.js';
 // Orders above this subtotal get free delivery.
 const FREE_DELIVERY_THRESHOLD = 2000;
 
-const createOrder = async (userId, products, paymentMethod, address) => {
+const createOrder = async (userId, products, paymentMethod, address, phone) => {
     try {
         if (!userId) {
             throw new Error('userId Required');
@@ -80,6 +80,7 @@ const createOrder = async (userId, products, paymentMethod, address) => {
         const order = await ORDER.create({
             userId,
             address: address.trim(),
+            phone: phone,
             products: orderProducts.map(({ productId, price, quantity }) => ({
                 productId,
                 price,
@@ -185,4 +186,17 @@ const getOrderById = async (userId, orderId) => {
     }
 };
 
-export { createOrder, getMyOrders, getAllOrders, getOrderById, FREE_DELIVERY_THRESHOLD };
+// update order status (only for admin)
+const updateOrderStatus = async (orderId, orderStatus) => {
+    try {
+        const updatedOrder = await ORDER.findByIdAndUpdate(orderId, { orderStatus: orderStatus }, { new: true })
+        if (!updatedOrder) {
+            throw new Error('Failed to update order');
+        }
+        return updatedOrder;
+    } catch (error) {
+        throw error
+    }
+}
+
+export { createOrder, getMyOrders, getAllOrders, getOrderById, FREE_DELIVERY_THRESHOLD, updateOrderStatus };

@@ -9,6 +9,6 @@ export { default as resendEmailVerificationOtp } from '../controllers/emailVerif
 export { default as forgotPassword } from '../controllers/forgotPassword.js';
 export { default as resetPassword } from '../controllers/resetPassword.js';
 export { createWish, getWishList } from '../controllers/wishController.js';
-export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController } from '../controllers/orderController.js';
+export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController, updateOrderStatusController } from '../controllers/orderController.js';
 export { getAllUsersController, updateProfileController, updateProfilePictureController, deleteUserController } from '../controllers/userController.js';
 export { getProductReviewsController, createReviewController, toggleHelpfulController, deleteReviewController } from '../controllers/reviewController.js';
