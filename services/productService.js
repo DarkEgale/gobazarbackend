@@ -1,7 +1,21 @@
-import Products from '../models/products.model.js';
+import Products, { CATEGORY_MAP } from '../models/products.model.js';
 import productThumbUpload from '../utils/productThumbnilUpload.js';
 import productImagesUpload from '../utils/productImagesUpload.js';
 import deleteProductImage from '../utils/productImageDelete.js';
+
+// category / subCategory pair validation (frontend dropdown-এর সাথে synced)
+const validateCategoryPair = (category, subCategory) => {
+    if (category && !CATEGORY_MAP[category]) {
+        throw new Error(
+            `Invalid category: ${category}. Allowed: ${Object.keys(CATEGORY_MAP).join(', ')}`
+        );
+    }
+    if (subCategory && category && !(CATEGORY_MAP[category] || []).includes(subCategory)) {
+        throw new Error(
+            `Invalid sub category "${subCategory}" for category "${category}". Allowed: ${(CATEGORY_MAP[category] || []).join(', ')}`
+        );
+    }
+};
 
 const createProduct = async (userId, data, files) => {
     console.log('\n========== CREATE PRODUCT START ==========');
@@ -107,6 +121,9 @@ const createProduct = async (userId, data, files) => {
 
 
         // ---------------- FINAL DATA ----------------
+
+        // category / subCategory validation
+        validateCategoryPair(data.category, data.subCategory);
 
         console.log('\n========== DATA BEFORE MONGODB ==========');
         console.dir(data, {
@@ -363,6 +380,22 @@ const updateProduct = async (id, data, files) => {
             update.searchTags = update.searchTags.split(',').map(t => t.trim()).filter(Boolean);
         } else {
             delete update.searchTags;
+        }
+
+        // category / subCategory validation — শুধু নতুন পাঠানো value validate হবে
+        // (পুরনো product-এ custom category থাকলেও শুধু price edit করা যাবে)
+        if (update.category !== undefined && !CATEGORY_MAP[update.category]) {
+            throw new Error(
+                `Invalid category: ${update.category}. Allowed: ${Object.keys(CATEGORY_MAP).join(', ')}`
+            );
+        }
+        if (update.subCategory !== undefined) {
+            const effectiveCategory = update.category ?? existing.category;
+            if (effectiveCategory && !(CATEGORY_MAP[effectiveCategory] || []).includes(update.subCategory)) {
+                throw new Error(
+                    `Invalid sub category "${update.subCategory}" for category "${effectiveCategory}". Allowed: ${(CATEGORY_MAP[effectiveCategory] || []).join(', ')}`
+                );
+            }
         }
 
         // ---- THUMBNAIL: নতুন ফাইল দেওয়া হলে তবেই replace হবে ----
