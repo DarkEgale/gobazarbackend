@@ -18,9 +18,32 @@ const validateCategoryPair = (category, subCategory, data) => {
     }
 };
 
-const normalizeBoolean = (value) => value === true || value === 'true';
+const getLastValue = (value) => Array.isArray(value) ? value[value.length - 1] : value;
+
+const normalizeBoolean = (value) => {
+    const normalized = getLastValue(value);
+    return normalized === true || normalized === 'true';
+};
+
+const normalizeNumberField = (data, fieldName) => {
+    if (data[fieldName] === undefined || data[fieldName] === null || data[fieldName] === '') {
+        return;
+    }
+
+    const value = Number(getLastValue(data[fieldName]));
+    if (Number.isNaN(value)) {
+        throw new Error(`${fieldName} must be a number`);
+    }
+    if (value < 0) {
+        throw new Error(`${fieldName} cannot be negative`);
+    }
+
+    data[fieldName] = value;
+};
 
 const parseJsonArray = (value, fieldName) => {
+    value = getLastValue(value);
+
     if (Array.isArray(value)) {
         return value;
     }
@@ -81,6 +104,8 @@ const validateVariantData = (data) => {
     }
 
     data.verients = [];
+    normalizeNumberField(data, 'price');
+    normalizeNumberField(data, 'stock');
 
     if (data.price === undefined || data.price === null) {
         throw new Error('Product price is required');
@@ -428,7 +453,8 @@ const getProductById = async (id) => {
 // Only these fields are accepted from the client on update (prevents mass-assignment)
 const PRODUCT_UPDATE_FIELDS = [
     'title', 'description', 'category', 'subCategory',
-    'price', 'discount', 'notes', 'delivary', 'paymentMethod'
+    'price', 'stock', 'discount', 'notes', 'delivary', 'paymentMethod',
+    'hasVariants', 'verients', 'searchTags', 'specifications'
 ];
 
 const updateProduct = async (id, data, files) => {
@@ -445,8 +471,36 @@ const updateProduct = async (id, data, files) => {
 
         // Whitelist fields (userId and everything else cannot be overridden by the client)
         for (const key of PRODUCT_UPDATE_FIELDS) {
-            if (data[key] !== undefined && data[key] !== '') {
-                update[key] = data[key];
+            const value = getLastValue(data[key]);
+            if (value !== undefined && value !== '') {
+                update[key] = value;
+            }
+        }
+
+        if (update.hasVariants !== undefined) {
+            update.hasVariants = normalizeBoolean(update.hasVariants);
+
+            if (update.hasVariants) {
+                update.verients = parseJsonArray(update.verients, 'verients');
+                validateVariantData(update);
+            } else {
+                update.verients = [];
+                normalizeNumberField(update, 'price');
+                normalizeNumberField(update, 'stock');
+            }
+        } else {
+            normalizeNumberField(update, 'price');
+            normalizeNumberField(update, 'stock');
+        }
+
+        normalizeNumberField(update, 'discount');
+        normalizeNumberField(update, 'delivary');
+
+        if (typeof update.specifications === 'string' && update.specifications.trim()) {
+            try {
+                update.specifications = JSON.parse(update.specifications);
+            } catch {
+                throw new Error('specifications must be valid JSON');
             }
         }
 
