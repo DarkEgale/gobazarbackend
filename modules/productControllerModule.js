@@ -5,5 +5,6 @@ export {
     getSingleProduct,
     searchProductsController,
     updateProductController,
-    deleteProductController
+    deleteProductController,
+    getTrendingProductsController
 } from '../controllers/productController.js';

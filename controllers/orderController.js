@@ -1,4 +1,4 @@
-import { createOrder, getMyOrders, getAllOrders, getOrderById, updateOrderStatus } from '../modules/serviceModule.js';
+import { createOrder, getMyOrders, getAllOrders, getOrderById, updateOrderStatus, cancelOrder } from '../modules/serviceModule.js';
 import { Response } from '../modules/module.js';
 
 
@@ -79,4 +79,18 @@ const updateOrderStatusController = async (req, res) => {
     }
 }
 
-export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController, updateOrderStatusController }
+export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController, updateOrderStatusController, cancelOrderController }
+
+// Customer cancels own pending order → stock is given back
+const cancelOrderController = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { id } = req.params;
+        const order = await cancelOrder(userId, id);
+        return Response(res, true, 200, 'Order cancelled successfully', order);
+    } catch (error) {
+        console.log('[Cancel Order]', error);
+        const statusCode = error.message === 'Order not found' ? 404 : 400;
+        return Response(res, false, statusCode, error.message || 'Failed to cancel order');
+    }
+}

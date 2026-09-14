@@ -6,7 +6,8 @@ import {
     getSingleProduct,
     searchProductsController,
     updateProductController,
-    deleteProductController
+    deleteProductController,
+    getTrendingProductsController
 } from "../../modules/productControllerModule.js";
 import userProtect from "../../middlewares/userProtect.js";
 import adminProtect from "../../middlewares/adminProtect.js";
@@ -17,6 +18,7 @@ const router = express.Router();
 // Public routes
 router.get('/', getFilteredProducts);
 router.get('/all', getAllProducts);
+router.get('/trending', getTrendingProductsController);
 router.get('/search', searchProductsController);
 router.get('/:id', getSingleProduct);
 

@@ -23,8 +23,8 @@ const userProtect = async (req, res, next) => {
         if (err.name === 'TokenExpiredError') {
             return Response(res, false, 401, 'TokenExpired');
         }
-        // jwt.verify invalid/tamper হলে JsonWebTokenError throw করে —
-        // এটা 500 না, 401 হওয়া উচিত
+        // jwt.verify throws JsonWebTokenError when the token is invalid/tampered —
+        // this should be a 401, not a 500
         if (err.name === 'JsonWebTokenError') {
             return Response(res, false, 401, 'Invalid Token');
         }

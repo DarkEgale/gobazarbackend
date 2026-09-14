@@ -3,7 +3,7 @@ import REVIEW from '../models/review.model.js';
 import Products from '../models/products.model.js';
 import ORDER from '../models/order.model.js';
 
-// Delivered order থাকলে এই user-এর review "Verified Purchase"
+// The review is marked "Verified Purchase" when the user has a delivered order
 const isVerifiedPurchase = async (userId, productId) => {
     const order = await ORDER.findOne({
         userId,
@@ -13,8 +13,8 @@ const isVerifiedPurchase = async (userId, productId) => {
     return !!order;
 };
 
-// Product-এর avg rating + review count recompute করে product doc-এ sync করা
-// (ProductCard / ProductDetails সরাসরি এই field দেখায়)
+// Recompute the product's avg rating + review count and sync it onto the product doc
+// (ProductCard / ProductDetails read these fields directly)
 const syncProductRating = async (productId) => {
     const stats = await REVIEW.aggregate([
         { $match: { productId: new mongoose.Types.ObjectId(String(productId)) } },
@@ -34,7 +34,7 @@ const syncProductRating = async (productId) => {
     return summary;
 };
 
-// নতুন review create বা নিজের আগের review update (এক user, এক product = এক review)
+// Create a new review or update the user's existing one (one user, one product = one review)
 const createOrUpdateReview = async (userId, productId, data) => {
     if (!userId) throw new Error('User Id is required');
     if (!productId) throw new Error('Product Id is required');
@@ -64,7 +64,7 @@ const createOrUpdateReview = async (userId, productId, data) => {
     return { review, summary };
 };
 
-// Product-এর সব review (paginated) + rating summary
+// All reviews of a product (paginated) + rating summary
 const getProductReviews = async (productId, page = 1, limit = 10) => {
     if (!productId) throw new Error('Product Id is required');
 
@@ -107,12 +107,12 @@ const getProductReviews = async (productId, page = 1, limit = 10) => {
     };
 };
 
-// নিজের review delete
+// Delete own review
 const deleteReview = async (userId, reviewId, isAdmin = false) => {
     if (!reviewId) throw new Error('Review Id is required');
     const review = await REVIEW.findById(reviewId);
     if (!review) throw new Error('Review not found');
-    // নিজের review ছাড়া অন্য কারোটা delete করা যাবে না (admin পারবে)
+    // Users cannot delete anyone's review but their own (admins can)
     if (String(review.userId) !== String(userId) && !isAdmin) {
         throw new Error('You can only delete your own review');
     }
@@ -121,7 +121,7 @@ const deleteReview = async (userId, reviewId, isAdmin = false) => {
     return summary;
 };
 
-// Helpful vote toggle — একই user দুবার vote করতে পারবে না
+// Helpful vote toggle — a user cannot vote twice
 const toggleHelpful = async (userId, reviewId) => {
     if (!userId) throw new Error('User Id is required');
     const review = await REVIEW.findById(reviewId);

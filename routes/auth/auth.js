@@ -32,8 +32,8 @@ router.post('/reset-password', authRateLimiter, resetPassword);
 router.post('/verify-forgot-password-otp', authRateLimiter, verifyForgotPasswordOtp);
 // Token management
 router.post('/refresh-token', refreshTokenCheck, newToken);
-// Logout-এ access token লাগে না — refresh token দিয়েই session identify হয়।
-// আগে userProtect ছিল, ফলে access token expire (১৫ মিনিট) হলে logout ব্যর্থ হতো।
+// Logout does not require an access token — the session is identified by the refresh token.
+// Previously userProtect was applied, so logout failed once the 15-minute access token expired.
 router.post('/logout', refreshTokenCheck, logout);
 
 export default router;

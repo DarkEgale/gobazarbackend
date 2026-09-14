@@ -10,17 +10,17 @@ const createRefreshSession = async (userId, ssId, currTokenHash, preTokenHash = 
         const token = await bcrypt.hash(currTokenHash, salt);
         const hashPreToken = preTokenHash ? await bcrypt.hash(preTokenHash, salt) : null;
 
-        // আগের pattern ছিল: findOneAndDelete → create (non-atomic)।
-        // মাঝখানে create fail হলে session চিরতরে হারিয়ে যেত।
-        // এখন atomic findOneAndUpdate + upsert — একই ssId এর record replace হয়,
-        // কোনো ফাঁকা সময় থাকে না এবং duplicate doc জমে না।
+        // Previous pattern: findOneAndDelete → create (non-atomic).
+        // If create failed in between, the session was lost forever.
+        // Now atomic findOneAndUpdate + upsert — the record for the same ssId is replaced,
+        // with no gap in between and no duplicate docs piling up.
         const refreshtoken = await RTH.findOneAndUpdate(
             { ssId: ssId },
             {
                 userId: userId,
                 currTokenHash: token,
                 preTokenHash: hashPreToken,
-                createdAt: new Date(), // TTL index যেন rotation থেকেই ৩০+ দিন গোনে
+                createdAt: new Date(), // TTL index counts the 30+ day lifetime from the rotation
             },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );

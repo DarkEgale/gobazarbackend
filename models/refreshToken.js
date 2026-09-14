@@ -16,10 +16,10 @@ const refreshToken = new mongoose.Schema({
     ssId: {
         type: String,
         default: null,
-        index: true // প্রতিটা query ssId দিয়েই হয় — lookup দ্রুত করার জন্য
+        index: true // every query goes through ssId — keeps lookups fast
     },
-    // TTL index — refresh token ৩০ দিন পরে মরে, তাই doc ও তার পরেই auto-delete
-    // (একটা session বানিয়ে ভুলে যাওয়া হলে DB-তে চিরতরে জমে থাকত না)
+    // TTL index — refresh tokens expire after 30 days, so the doc auto-deletes shortly after
+    // (an abandoned session will not sit in the DB forever)
     createdAt: {
         type: Date,
         expires: '31d'

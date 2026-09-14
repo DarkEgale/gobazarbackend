@@ -15,7 +15,7 @@ const OtpSchema = new mongoose.Schema({
     }
 })
 
-// MongoDB TTL index — expired OTP document নিজে নিজে delete হবে
+// MongoDB TTL index — expired OTP documents are deleted automatically
 OtpSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 })
 
 const OTP = mongoose.model('Otp', OtpSchema)

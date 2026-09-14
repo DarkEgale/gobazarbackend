@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs';
 
 // Refresh token Validation
 // Return values:
-//   'pass'  → current token মিলেছে, normal rotation হবে
-//   'grace' → previous token মিলেছে (multi-tab race, নিচের ব্যাখ্যা দেখুন)
-// সব invalid ক্ষেত্রে generic 'Unauthorize' throw করা হয় — middleware 401 পাঠাবে
+//   'pass'  → current token matched, normal rotation follows
+//   'grace' → previous token matched (multi-tab race, see explanation below)
+// All invalid cases throw a generic 'Unauthorize' — the middleware responds with 401
 const RTV = async (ssId, userId, token) => {
     if (!ssId || !userId || !token) {
         throw new Error('Unauthorize');
@@ -14,19 +14,19 @@ const RTV = async (ssId, userId, token) => {
     if (!tokencheck) {
         throw new Error('Unauthorize');
     }
-    // Current token match → সব ঠিক আছে, rotation হবে
+    // Current token match → all good, rotation proceeds
     if (await bcrypt.compare(token, tokencheck.currTokenHash)) {
         return 'pass';
     }
     // Previous token match → multi-tab race:
-    // একই browser-এর একাধিক tab একসাথে refresh করলে, প্রথম tab এর response
-    // cookie update করার আগেই বাকি tab গুলো পুরনো (previous) token দিয়েই
-    // request পাঠায়। এটা attack না — তাই session revoke করা হবে না,
-    // শুধু নতুন access token দেওয়া হবে (refresh state অপরিবর্তিত থাকবে)।
+    // When multiple tabs of the same browser refresh at once, the other tabs still send
+    // the old (previous) token before the first tab's response updates the cookie.
+    // This is not an attack — the session is not revoked; only a new access token
+    // is issued (refresh state stays untouched).
     if (tokencheck.preTokenHash && (await bcrypt.compare(token, tokencheck.preTokenHash))) {
         return 'grace';
     }
-    // কোনোটাই মিলল না → token চুরি/tamper করা বা session আর নেই
+    // Nothing matched → stolen/tampered token or the session no longer exists
     throw new Error('Unauthorize');
 };
 

@@ -19,8 +19,8 @@ const accessToken = new mongoose.Schema({
         required: true,
         index: true
     },
-    // TTL index — access token মাত্র ১৫ মিনিট বাঁচে, session doc ১ দিন পরেই auto-delete
-    // (আগে প্রতিটা refresh এ নতুন doc তৈরি হতো, পুরনোগুলো জমতেই থাকত)
+    // TTL index — access tokens live only 15 minutes; the session doc auto-deletes after 1 day
+    // (previously every refresh created a new doc and stale ones kept piling up)
     createdAt: {
         type: Date,
         expires: '1d'

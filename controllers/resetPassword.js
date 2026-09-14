@@ -49,7 +49,7 @@ const resetPassword = async (req, res) => {
         user.password = hashedPassword;
         await user.save();
 
-        // Password reset হলে সব পুরনো session বাতিল — চোরে পুরনো token দিয়ে ঢুকতে পারবে না
+        // Password reset revokes all old sessions — a thief cannot get back in with stolen tokens
         await ATH.deleteMany({ userId: user._id });
         await RTH.deleteMany({ userId: user._id });
 

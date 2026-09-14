@@ -16,16 +16,16 @@ const createAccessSession = async (userId, ssId, currToken, preToken = null) => 
         const hashToken = await bcrypt.hash(currToken, salt)
         const hashPreToken = preToken ? await bcrypt.hash(preToken, salt) : null
 
-        // আগে প্রতিটা refresh এ নতুন doc create হতো, পুরনোটা থেকে যেত —
-        // DB-তে একই ssId এর অগণিত doc জমত। এখন atomic upsert দিয়ে
-        // একই ssId এর record replace হয়।
+        // Previously every refresh created a new doc and left the old one behind —
+        // countless docs with the same ssId piled up in the DB. Now an atomic upsert
+        // replaces the record for the same ssId.
         const result = await ATH.findOneAndUpdate(
             { ssId: ssId },
             {
                 userId: userId,
                 currTokenHash: hashToken,
                 preTokenHash: hashPreToken,
-                createdAt: new Date() // TTL index যেন শেষ rotation থেকেই গোনা হয়
+                createdAt: new Date() // TTL index counts from the latest rotation
             },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         )

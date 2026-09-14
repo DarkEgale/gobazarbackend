@@ -9,7 +9,7 @@ const verifyForgotPasswordOtp = async (req, res) => {
         if (!otpRecord) {
             return Response(res, false, 400, 'Invalid OTP or email');
         }
-        // Expiry check (আগে ছিল না — মেয়াদোত্তীর্ণ OTP-ও pass হয়ে যেত)
+        // Expiry check (previously missing — expired OTPs could still pass)
         if (otpRecord.expireAt < Date.now()) {
             await ForgotPasswordOtp.findByIdAndDelete(otpRecord._id);
             return Response(res, false, 400, 'OTP has expired. Please request a new one.');

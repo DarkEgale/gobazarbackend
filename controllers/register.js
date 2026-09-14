@@ -72,7 +72,7 @@ const register = async (req, res) => {
         const cookieOptions = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 15 * 60 * 1000,
             path: '/'
         };
@@ -80,7 +80,7 @@ const register = async (req, res) => {
         const refreshCookieOptions = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 30 * 24 * 60 * 60 * 1000,
             path: '/'
         };
@@ -88,7 +88,7 @@ const register = async (req, res) => {
         res.cookie('accessToken', accessToken, cookieOptions);
         res.cookie('refreshToken', refreshToken, refreshCookieOptions);
 
-        // Return user without password (ssId client-এ leak করা হয় না — এটা cookie-র JWT-তেই থাকে)
+        // Return user without password (ssId is never leaked to the client — it lives in the cookie JWT)
         const userResponse = {
             _id: user._id,
             name: user.name,

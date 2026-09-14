@@ -7,8 +7,8 @@ const newToken = async (req, res) => {
     try {
         const { userId, ssId } = req.user;
         const preToken = req.preToken || null;
-        // 'grace' = previous refresh token দিয়ে এসেছে (multi-tab race) —
-        // এই ক্ষেত্রে শুধু নতুন access token দেওয়া হবে, refresh state ধরা হবে না
+        // 'grace' = the request came with the previous refresh token (multi-tab race) —
+        // in this case only a new access token is issued and the refresh state is left untouched
         const graceRefresh = req.graceRefresh === true;
 
         if (!userId || !ssId) {
@@ -19,24 +19,24 @@ const newToken = async (req, res) => {
         const newAccessToken = await TokenGen(userId, ssId);
 
         // Update access session: shift current to previous, new to current
-        // (আগের access token cookie-তেই আছে — সেটাই previous হিসেবে store হবে)
+        // (the previous access token is already in the cookie — it will be stored as previous)
         const oldAccessToken = req.cookies?.accessToken || null;
         await createAccessSession(userId, ssId, newAccessToken, oldAccessToken);
 
         let newRefreshToken = null;
         if (!graceRefresh) {
-            // Normal rotation: পুরনো refresh token previous হিসেবে store হবে,
-            // নতুনটা current হবে (atomic upsert — আলাদা delete লাগে না)
+            // Normal rotation: the old refresh token is stored as previous,
+            // the new one becomes current (atomic upsert — no separate delete needed)
             newRefreshToken = await RefreshTokenGen(userId, ssId);
             await createRefreshSession(userId, ssId, newRefreshToken, preToken);
         }
-        // grace হলে DB-তে কিছু বদলায় না — যারা পুরনো token নিয়ে দৌড়াচ্ছিল
-        // তারাও পরের বার normal path দিয়ে rotate করতে পারবে
+        // In grace mode nothing changes in the DB — tabs still running with old tokens
+        // can rotate through the normal path on their next attempt
 
         const cookieOptions = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             maxAge: 15 * 60 * 1000,
             path: '/'
         };
@@ -47,14 +47,14 @@ const newToken = async (req, res) => {
             const rcookieOptions = {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'none',
+                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 path: '/'
             };
             res.cookie('refreshToken', newRefreshToken, rcookieOptions);
         }
-        // grace হলে refresh cookie নতুন করে set করা হয় না — browser-এ
-        // আগের থেকেই একটা valid refresh token আছে
+        // In grace mode the refresh cookie is not set again — the browser
+        // already holds a valid refresh token
 
         return Response(res, true, 200, 'Token generated successfully');
     } catch (err) {

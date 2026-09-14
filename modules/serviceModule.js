@@ -1,5 +1,10 @@
 export { default as GoogleLogin } from '../services/googleLogin.js';
 export { CreateWish, getMyWish } from '../services/wishservice.js';
-export { createOrder, getMyOrders, getAllOrders, getOrderById, updateOrderStatus } from '../services/orderService.js';
+export { createOrder, getMyOrders, getAllOrders, getOrderById, updateOrderStatus, cancelOrder } from '../services/orderService.js';
+export { createReturnRequest, getMyReturns, getAllReturns, updateReturnStatus, ALLOWED_RETURN_STATUSES } from '../services/returnProductService.js';
+export { getSettings, updateSettings } from '../services/settingService.js';
+export { sendMessage, getMyConversation, getConversations, getConversationByUser, markConversationRead } from '../services/chatService.js';
+export { getLogs, clearLogs } from '../services/logService.js';
+export { getServerHealth } from '../services/serverHealthService.js';
 export { getAlluser, updateUserProfile, updateProfilePicture, deleteUserAccount } from '../services/userService.js';
 export { createOrUpdateReview, getProductReviews, deleteReview, toggleHelpful } from '../services/reviewService.js';

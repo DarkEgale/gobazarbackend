@@ -9,6 +9,11 @@ export { default as resendEmailVerificationOtp } from '../controllers/emailVerif
 export { default as forgotPassword } from '../controllers/forgotPassword.js';
 export { default as resetPassword } from '../controllers/resetPassword.js';
 export { createWish, getWishList } from '../controllers/wishController.js';
-export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController, updateOrderStatusController } from '../controllers/orderController.js';
+export { createOrderController, getOrdersController, getAllOrdersController, getOrderByIdController, updateOrderStatusController, cancelOrderController } from '../controllers/orderController.js';
+export { createReturnRequestController, getMyReturnsController, getAllReturnsController, updateReturnStatusController } from '../controllers/returnProductController.js';
+export { getSettingsController, updateSettingsController } from '../controllers/settingController.js';
+export { sendMessageController, sendAdminMessageController, getMyConversationController, getConversationsController, getConversationController } from '../controllers/chatController.js';
+export { getLogsController, clearLogsController } from '../controllers/logController.js';
+export { getServerHealthController } from '../controllers/serverHealthController.js';
 export { getAllUsersController, updateProfileController, updateProfilePictureController, deleteUserController } from '../controllers/userController.js';
 export { getProductReviewsController, createReviewController, toggleHelpfulController, deleteReviewController } from '../controllers/reviewController.js';

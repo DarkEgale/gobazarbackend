@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from 'dotenv';
 dotenv.config();
-// Security fix: credentials আর console-এ print করা হয় না (log leak)
+// Security fix: credentials are never printed to the console (log leak prevention)
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUD_API_KEY,

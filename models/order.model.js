@@ -12,6 +12,16 @@ const orderSchema = new mongoose.Schema({
                 ref: "Products",
                 required: true
             },
+            // Variant of the product (only when the product has variants).
+            // If absent → the product has no variants (product-level stock applies).
+            variantId: {
+                type: mongoose.Schema.Types.ObjectId
+            },
+            // Snapshot of the ordered variant attributes (e.g. { color: "Black", size: "XL" })
+            // so the order stays accurate even if the merchant edits variants later.
+            variantAttributes: {
+                type: mongoose.Schema.Types.Mixed
+            },
             price: {
                 type: Number,
                 required: true
@@ -49,8 +59,14 @@ const orderSchema = new mongoose.Schema({
     },
     orderStatus: {
         type: String,
-        enum: ['pending', 'shipping', 'shipped', 'on_the_way', 'deliverd'],
+        enum: ['pending', 'shipping', 'shipped', 'on_the_way', 'deliverd', 'cancelled'],
         default: "pending"
+    },
+    // Set automatically when admin marks the order as 'deliverd'.
+    // Used to enforce the 7-day product return window.
+    deliveredAt: {
+        type: Date,
+        default: null
     },
     deliveryCharge: {
         type: Number,

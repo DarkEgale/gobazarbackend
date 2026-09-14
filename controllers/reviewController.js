@@ -46,7 +46,7 @@ const toggleHelpfulController = async (req, res) => {
     }
 }
 
-// DELETE /api/reviews/:reviewId (review-এর মালিক)
+// DELETE /api/reviews/:reviewId (review owner)
 const deleteReviewController = async (req, res) => {
     try {
         const userId = req.user?.userId;

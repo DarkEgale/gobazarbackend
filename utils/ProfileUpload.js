@@ -33,8 +33,8 @@ const uploadImage = async (file) => {
             ]
         },
             // Cloudinary callback signature: (error, result) —
-            // আগে (result, error) লেখা ছিল, ফলে upload সফল হলেও result object-টাই
-            // error হিসেবে reject হতো এবং প্রতিবার avatar upload fail করত
+            // previously written as (result, error), so even a successful upload rejected
+            // with the result object as the error and avatar upload failed every time
             (error, result) => {
                 if (error) {
                     return reject(error)

@@ -6,7 +6,8 @@ import {
     getPaginatedProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getTrendingProducts
 } from '../modules/productServiceModule.js';
 
 // Create a new product
@@ -96,6 +97,18 @@ const deleteProductController = async (req, res) => {
     }
 };
 
+// TOP SELLING products (trending — aggregated from orders)
+const getTrendingProductsController = async (req, res) => {
+    try {
+        const { limit = 20 } = req.query;
+        const products = await getTrendingProducts(limit);
+        return Response(res, true, 200, 'Trending products fetched', { products });
+    } catch (error) {
+        console.log('[Trending Products]', error);
+        return Response(res, false, 500, error.message || 'Failed to fetch trending products');
+    }
+}
+
 export {
     createProductController,
     getAllProducts,
@@ -103,5 +116,6 @@ export {
     getSingleProduct,
     searchProductsController,
     updateProductController,
-    deleteProductController
+    deleteProductController,
+    getTrendingProductsController
 };

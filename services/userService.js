@@ -16,15 +16,15 @@ const updateProfilePicture = async (userId, file) => {
     }
     try {
         const upload = await uploadImage(file)
-        // avatar field আগে ভুল করে 'avtar' লেখা ছিল — schema-র সাথে মিলছে না
+        // the avatar field was previously misspelled 'avtar' — now matches the schema
         const updateUser = await User.findByIdAndUpdate(
             userId,
             { avatar: upload.secure_url, avatarPublicId: upload.public_id },
             { new: true, runValidators: true }
         ).select('-password -googleId');
-        // পুরনো প্রোফাইল ছবি Cloudinary থেকে delete —
-        // এটা non-critical: delete fail হলেও নতুন avatar ইতিমধ্যে set হয়ে গেছে,
-        // তাই পুরো request fail করা ঠিক না (orphan cleanup-এর জন্য log করা হবে)
+        // Delete the old profile image from Cloudinary —
+        // non-critical: even if the delete fails, the new avatar is already set,
+        // so the whole request should not fail (logged for orphan cleanup)
         if (user.avatarPublicId) {
             await deleteImage(user.avatarPublicId).catch((err) => {
                 console.error('[Avatar cleanup] Failed to delete old image:', err?.message || err);
@@ -36,7 +36,7 @@ const updateProfilePicture = async (userId, file) => {
     }
 }
 
-// Update profile data (এখন শুধু name — email change করা হয় না security-র কারণে)
+// Update profile data (name only — email changes are disallowed for security reasons)
 const updateUserProfile = async (userId, data) => {
     if (!userId) {
         throw new Error('User Id is required')
@@ -106,14 +106,14 @@ const getAlluser = async (page = 1, limit = 50) => {
         throw error;
     }
 }
-// For admin delete user account (সাথে user-এর orders ও wishlist ও clean হবে)
+// Admin delete user account (also cleans up the user's orders and wishlist)
 const deleteUserAccount = async (userId) => {
     try {
         const deleted = await User.findByIdAndDelete(userId)
         if (!deleted) {
             throw new Error('Falied to delete user')
         }
-        // user-এর সব related data বাদ দেওয়া
+        // remove all of the user's related data
         await WishList.deleteMany({ userId });
         await ORDER.deleteMany({ userId });
         return deleted;

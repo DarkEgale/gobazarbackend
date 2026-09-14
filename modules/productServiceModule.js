@@ -5,5 +5,6 @@ export {
     getPaginatedProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getTrendingProducts
 } from '../services/productService.js';

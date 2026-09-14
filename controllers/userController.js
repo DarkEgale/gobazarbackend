@@ -47,14 +47,14 @@ const updateProfilePictureController = async (req, res) => {
     }
 }
 
-// Delete a user (Admin only) — self-delete ব্লক
+// Delete a user (Admin only) — self-delete blocked
 const deleteUserController = async (req, res) => {
     try {
         const { id } = req.params;
         if (!id) {
             return Response(res, false, 400, 'User id is required');
         }
-        // Admin নিজের account নিজে delete করতে পারবে না
+        // An admin cannot delete their own account
         if (String(req.user.userId) === String(id)) {
             return Response(res, false, 400, 'You cannot delete your own account');
         }

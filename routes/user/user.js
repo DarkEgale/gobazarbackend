@@ -10,9 +10,9 @@ const router = express.Router();
 // Profile update (logged-in user)
 router.patch('/profile', userProtect, updateProfileController);
 
-// Multer error (file > 5MB / non-image) হলে Express default handler-এ গেলে
-// HTML error page ফেরত যেত — frontend-এ অর্থহীন message দেখাত।
-// এখানে ধরে clean JSON 400 response দেওয়া হচ্ছে।
+// Without this, a Multer error (file > 5MB / non-image) would fall through to the
+// default Express handler and return an HTML error page — meaningless for the frontend.
+// Caught here and answered with a clean JSON 400 response.
 router.post('/profile/avatar', userProtect, (req, res, next) => {
     upload.single('avatar')(req, res, (err) => {
         if (err) {

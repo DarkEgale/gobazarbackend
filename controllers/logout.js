@@ -11,7 +11,7 @@ const logout = async (req, res) => {
         }
 
         // Delete the access + refresh sessions from database
-        // (RTH delete না করলে logout-এর পরেও refresh token ৩০ দিন কাজ করত)
+        // (without deleting the RTH entry, the refresh token would keep working for 30 days after logout)
         await ATH.findOneAndDelete({ ssId, userId });
         await RTH.findOneAndDelete({ ssId, userId });
 
@@ -19,14 +19,14 @@ const logout = async (req, res) => {
         res.clearCookie('accessToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: '/'
         });
 
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: '/'
         });
 

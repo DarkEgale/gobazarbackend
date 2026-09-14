@@ -20,7 +20,7 @@ const forgotPassword = async (req, res) => {
         if (!user) {
             return Response(res, false, 404, 'User not found with this email');
         }
-        // Generate OTP (পুরনো OTP গুলো বাতিল — একসাথে একাধিক valid OTP থাকলে attack surface বাড়ে)
+        // Generate OTP (invalidate previous OTPs — multiple valid OTPs at once increase the attack surface)
         await ForgotPasswordOtp.deleteMany({ email: email });
 
         const otp = generateOTP();

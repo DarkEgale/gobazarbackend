@@ -1,7 +1,7 @@
 import multer from "multer";
 
-// Security: memoryStorage হলেও file size limit + image-only filter না থাকলে
-// যে কেউ বিশাল ফাইল পাঠিয়ে server-এর RAM শেষ করে দিতে পারে (DoS)
+// Security: even with memoryStorage, without a file size limit and an image-only
+// filter anyone could exhaust server RAM by uploading huge files (DoS)
 const storage = multer.memoryStorage();
 
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];

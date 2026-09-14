@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-// Product review / feedback schema — প্রতি user একটি product-এ একটাই review দিতে পারবে
+// Product review / feedback schema — a user can leave only one review per product
 const reviewSchema = new mongoose.Schema({
     productId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -31,27 +31,27 @@ const reviewSchema = new mongoose.Schema({
         minlength: [3, 'Review comment must be at least 3 characters'],
         maxlength: [1000, 'Review comment can not exceed 1000 characters']
     },
-    // এই user সত্যিই product-টা কিনেছে কিনা (delivered order থাকলে true)
+    // whether this user actually purchased the product (true if a delivered order exists)
     verifiedPurchase: {
         type: Boolean,
         default: false
     },
-    // "Helpful" feedback — কতজন vote করেছে
+    // "Helpful" feedback — vote count
     helpful: {
         type: Number,
         default: 0,
         min: 0
     },
-    // কারা vote করেছে — একই user দুবার vote করতে না পারে
+    // voters — a user cannot vote twice
     helpfulBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }]
 }, { timestamps: true })
 
-// একই user একই product-এ একটাই review
+// one review per user per product
 reviewSchema.index({ productId: 1, userId: 1 }, { unique: true })
-// product ভিত্তিক সাম্প্রতিক review দ্রুত লোড হওয়ার জন্য
+// speeds up loading recent reviews per product
 reviewSchema.index({ productId: 1, createdAt: -1 })
 
 const REVIEW = mongoose.model('Review', reviewSchema)

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
+import verientSchema from './productVerients.model.js'
 
-// Category → Sub Category map (frontend ProductForm dropdown-এর সাথে synced রাখতে হবে)
+// Category → Sub Category map (must stay in sync with the frontend ProductForm dropdown)
 export const CATEGORY_MAP = {
     Electronics: ["Headphones", "Smart Watch", "Camera", "Keyboard", "Speaker", "Mobile", "Laptop", "Accessories"],
     Fashion: ["Men", "Women", "Kids", "Shoes", "Bags", "Accessories"],
@@ -25,6 +26,25 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String
     },
+    specifications: {
+        type: mongoose.Schema.Types.Mixed
+    },
+    hasVariants: {
+        type: Boolean,
+        default: false
+    },
+    // Product-level stock — used when the product has NO variants (hasVariants = false).
+    // When hasVariants = true, each variant holds its own stock and this value
+    // is kept as the SUM of all variant stocks (for display / filtering).
+    stock: {
+        type: Number,
+        default: 0,
+        min: [0, 'Stock can not be negative']
+    },
+    verients: {
+        type: [verientSchema],
+        default: []
+    },
     category: {
         type: String,
         enum: {
@@ -37,7 +57,7 @@ const productSchema = new mongoose.Schema({
     },
     thumbnil: {
         type: String,
-        required: [true, 'Selecet a thumbnil']
+        required: [true, 'Select a thumbnail']
     },
     photos: {
         type: [String]
@@ -61,8 +81,8 @@ const productSchema = new mongoose.Schema({
     searchTags: {
         type: [String]
     },
-    // Rating summary — review service নিজে থেকেই recompute করে (avg rating + total review)
-    // ফলে ProductCard / ProductDetails-এ সরাসরি সত্যিকারের rating দেখা যায়
+    // Rating summary — recomputed by the review service (avg rating + total review),
+    // so ProductCard / ProductDetails can display the real rating directly
     rating: {
         type: Number,
         default: 0,

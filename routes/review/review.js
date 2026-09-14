@@ -6,7 +6,7 @@ import { getProductReviewsController, createReviewController, toggleHelpfulContr
 
 const router = express.Router();
 
-// Public — যে কেউ product-এর review দেখতে পারবে
+// Public — anyone can view a product's reviews
 router.get('/product/:productId', getProductReviewsController);
 
 // Logged-in user — review create/update, helpful vote, delete

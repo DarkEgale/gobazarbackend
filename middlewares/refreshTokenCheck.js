@@ -18,8 +18,8 @@ const refreshTokenCheck = async (req, res, next) => {
         const check = await RTV(ssId, userId, token);
         req.user = { userId, ssId };
         req.preToken = token;
-        // 'grace' হলে previous token দিয়ে এসেছে (multi-tab race) —
-        // newToken controller এই flag দেখে refresh rotation skip করবে
+        // 'grace' means the request came with the previous token (multi-tab race) —
+        // the newToken controller sees this flag and skips refresh rotation
         req.graceRefresh = check === 'grace';
         next();
     } catch (err) {

@@ -16,7 +16,7 @@ const forgotPasswordSchema = new mongoose.Schema({
     }
 })
 
-// MongoDB TTL index — expired OTP document নিজে নিজে delete হবে
+// MongoDB TTL index — expired OTP documents are deleted automatically
 forgotPasswordSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 const ForgotPasswordOtp = mongoose.model('ForgotPasswordOtp', forgotPasswordSchema);
